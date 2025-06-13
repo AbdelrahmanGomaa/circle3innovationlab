@@ -15,7 +15,7 @@ services:
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sqlserver
+    container_name: circle3lab-sql
     environment:
       SA_PASSWORD: "P@ssw0rd123Circle"
       ACCEPT_EULA: "Y"
