@@ -1,0 +1,247 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Blogs>
+@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
+@using Umbraco.Cms.Core.Models
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+@{
+	Layout = "MasterTemplate.cshtml";
+	
+	  <!-- ================================
+    FOR SEO -- WE TOLD GOOGLE JUST CARE ABOUT PAGE NUMBER 1 ONLY 
+================================= -->
+  
+    // Get the current page number from the query string
+    var currentPage = HttpContextAccessor.HttpContext.Request.Query["page"];
+    
+    // Set the canonical URL to be the base URL of the blog
+    var canonicalUrl = currentPage == "1" || string.IsNullOrEmpty(currentPage)
+        ? "/blogs"
+        : $"/blogs?page={currentPage}";
+
+    // Pass the canonical URL to the layout
+    ViewData["Canonical"] = canonicalUrl;
+
+
+	var selection = Umbraco.Content(Guid.Parse("95dc5cda-2977-4661-8da4-1f1b749198e0"))
+    .ChildrenOfType("blogDetails")
+    .Where(x => x.IsVisible())
+    .OrderByDescending(x => x.CreateDate);
+
+
+	
+	
+int pageSize = 6;
+int page;
+
+if (!int.TryParse(HttpContextAccessor.HttpContext.Request.Query["page"], out page))
+{
+    page = 1;
+}
+
+int totalNodes = selection.Count();
+int totalPages = (int)Math.Ceiling((double)totalNodes / (double)pageSize);
+
+if (page > totalPages)
+{
+    page = totalPages;
+}
+else if (page < 1)
+{
+    page = 1;
+}
+
+
+
+    // جلب المدونات الخاصة بالصفحة الحالية
+    var paginatedItems = selection.Skip((page - 1) * pageSize).Take(pageSize);
+}
+
+
+
+
+    <!-- ================================
+    START BREADCRUMB AREA
+================================= -->
+    <section class="breadcrumb-area section-padding img-bg-2">
+      <div class="overlay"></div>
+      <div class="container">
+        <div
+          class="breadcrumb-content d-flex flex-wrap align-items-center justify-content-between"
+        >
+          <div class="section-heading">
+            <h2 class="section__title text-white">Blog No Sidebar</h2>
+          </div>
+          <ul
+            class="generic-list-item generic-list-item-white generic-list-item-arrow d-flex flex-wrap align-items-center"
+          >
+            <li><a href="index.html">Home</a></li>
+            <li>Blog</li>
+            <li>Blog No Sidebar</li>
+          </ul>
+        </div>
+        <!-- end breadcrumb-content -->
+      </div>
+      <!-- end container -->
+    </section>
+    <!-- end breadcrumb-area -->
+    <!-- ================================
+    END BREADCRUMB AREA
+================================= -->
+
+    <!-- ================================
+       START BLOG AREA
+================================= -->
+    <section class="blog-area section--padding">
+      <div class="container">
+        <div class="row">
+            
+            
+                @foreach (var item in paginatedItems)
+            	{
+		      
+	        var BlogImage = item.Value<MediaWithCrops>("blogImage");
+            var blogDate = item.Value<DateTime>("blogDate");
+
+
+
+          <div class="col-lg-4">
+            <div class="card card-item">
+              <div class="card-image">
+                <a href="@item.Url()" class="d-block">
+                  <img
+                    class="card-img-top lazy"
+                    src="@BlogImage?.MediaUrl()"
+                    data-src="@BlogImage?.MediaUrl()"
+                    alt="Card image cap"
+                  />
+                </a>
+                <div class="course-badge-labels">
+                  <div class="course-badge">@blogDate.ToString("dd-MMM-yyyy")</div>
+                </div>
+              </div>
+              <!-- end card-image -->
+              <div class="card-body">
+                <h5 class="card-title">
+                  <a href="@item.Url()"
+                    >@item.Value("blogTitle")</a
+                  >
+                </h5>
+                <ul
+                  class="generic-list-item generic-list-item-bullet generic-list-item--bullet d-flex align-items-center flex-wrap fs-14 pt-2"
+                >
+                  <li class="d-flex align-items-center">
+                    <a href="#">@item.Value("blogSubDesc")</a>
+                  </li>
+                  <!--<li class="d-flex align-items-center">
+                    <a href="#">4 Comments</a>
+                  </li>
+                  <li class="d-flex align-items-center">
+                    <a href="#">130 Likes</a>
+                  </li>-->
+                </ul>
+                <div
+                  class="d-flex justify-content-between align-items-center pt-3"
+                >
+                  <a
+                    href="@item.Url()"
+                    class="btn theme-btn theme-btn-sm theme-btn-white"
+                    >Read More<i class="la la-arrow-right icon ms-1"></i
+                  ></a>
+                  <div class="share-wrap">
+                    <ul class="social-icons social-icons-styled">
+                      <li class="me-0">
+                        <a href="#" class="facebook-bg"
+                          ><i class="la la-facebook"></i
+                        ></a>
+                      </li>
+                      <li class="me-0">
+                        <a href="#" class="twitter-bg"
+                          ><i class="la la-twitter"></i
+                        ></a>
+                      </li>
+                      <li class="me-0">
+                        <a href="#" class="instagram-bg"
+                          ><i class="la la-instagram"></i
+                        ></a>
+                      </li>
+                    </ul>
+                    <div
+                      class="icon-element icon-element-sm shadow-sm cursor-pointer share-toggle"
+                      title="Toggle to expand social icons"
+                    >
+                      <i class="la la-share-alt"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end card-body -->
+            </div>
+            <!-- end card -->
+          </div>
+          <!-- end col-lg-4 -->
+     
+     	}
+     
+     
+        </div>
+        <!-- end row -->
+        <div class="text-center pt-3">
+            
+            		    
+        					    
+        			
+        					    
+            
+                            
+                            
+                            
+                    <nav aria-label="Page navigation example" class="pagination-box">
+                    <ul class="pagination justify-content-center">
+                        
+                       <!-- Previous -->
+                        <li class="page-item @(page <= 1 ? "disabled" : "")">
+                            <a class="page-link" href="@(page - 1 == 1 ? "/blogs" : $"/blogs?page={page - 1}")" aria-label="Previous">
+                                <span aria-hidden="true"><i class="la la-arrow-left"></i></span>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                        </li>
+                        
+                        <!-- Pages -->
+                        @for (int i = 1; i <= totalPages; i++)
+                        {
+                            <li class="page-item @(i == page ? "active" : "")">
+                                <a class="page-link" href="@(i == 1 ? "/blogs" : $"/blogs?page={i}")">@i</a>
+                            </li>
+                        }
+                        
+                        <!-- Next -->
+                        <li class="page-item @(page >= totalPages ? "disabled" : "")">
+                            <a class="page-link" href="@(page + 1 == 1 ? "/blogs" : $"/blogs?page={page + 1}")" aria-label="Next">
+                                <span aria-hidden="true"><i class="la la-arrow-right"></i></span>
+                                <span class="sr-only">Next</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+
+          
+          
+          
+          
+          
+                          @{
+                    var startItem = ((page - 1) * pageSize) + 1;
+                    var endItem = Math.Min(startItem + pageSize - 1, totalNodes);
+                }
+                <p class="fs-14 pt-2">Showing @startItem-@endItem of @totalNodes results</p>
+                
+        </div>
+      </div>
+      <!-- end container -->
+    </section>
+    <!-- end blog-area -->
+    <!-- ================================
+       START BLOG AREA
+================================= -->

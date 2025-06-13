@@ -1,0 +1,155 @@
+﻿@using circle3innovationlab.Models;
+@using Microsoft.AspNetCore.Mvc.ModelBinding;
+@using Umbraco.Cms.Web.Common;
+@using Umbraco.Extensions
+@using circle3innovationlab
+@using Umbraco.Cms.Web.Common.PublishedModels
+@using Umbraco.Cms.Web.Common.Views
+@using Umbraco.Cms.Core.Models.PublishedContent
+
+@using circle3innovationlab.Controllers
+@using Umbraco.Cms.Core.Models
+@model circle3innovationlab.Models.StudentFormViewModel
+
+@inject UmbracoHelper umbracoHelper
+
+@{
+    var successMessage = ViewBag.SuccessMessage as string;
+    var modelState = TempData["ModelState"] as ModelStateDictionary;
+    var studentFormModel = TempData["StudentFormModel"] as StudentFormController;
+}
+
+<div class="card-body">
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            Please fix the errors below.
+        </div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    else
+    {
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        @using (Html.BeginUmbracoForm<StudentFormController>(nameof(StudentFormController.SubmitAsync), null, new { @class = "was-validated row" }))
+        {
+            @* Confirmation message can be shown after successful post, not inside this form *@
+
+
+            <!-- Honeypot Field (hidden from users) -->
+            <div style="display: none;">
+                <input type="text" name="Website" />
+            </div>
+
+            <div class="input-box col-lg-6">
+                <label class="label-text">Name</label>
+                <div class="form-group">
+                    <input asp-for="StudentName" class="form-control form--control" placeholder="Your Name" />
+                    <span asp-validation-for="StudentName" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="input-box col-lg-6">
+                <label class="label-text">Phone Number</label>
+                <div class="form-group">
+                    <input asp-for="PhoneNumber"
+                           pattern="^\+?[0-9][0-9]{9,14}$"
+                           class="form-control form--control"
+                           placeholder="Enter your phone number"
+                           type="tel" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="input-box col-lg-6">
+                <label class="label-text">Email Address</label>
+                <div class="form-group">
+                    <input asp-for="Email"
+                           pattern="[A-Za-z0-9._%+-]+[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                           class="form-control form--control"
+                           placeholder="Enter your email address"
+                           type="email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="input-box col-lg-6">
+            <label class="label-text">College</label>
+            <div class="form-group">
+                    <input asp-for="College" class="form-control form--control" placeholder="e.g. faculty of engineering ain shams university" data-val="false" />
+
+            </div>
+            </div>
+
+            <div class="input-box col-lg-6">
+                <label class="label-text">Class you want to apply for</label>
+                <div class="form-group select2-full-wrapper">
+                    <div class="select-container w-auto">
+                        <select asp-for="ChooseCourse" class="select-container-select">
+                            <option value="" disabled selected>Select a category</option>
+                            <option value="development">Development</option>
+                            <option value="business">Business</option>
+                            <option value="design">Design</option>
+                            <option value="marketing">Marketing</option>
+                            <option value="lifestyle">Lifestyle</option>
+                            <option value="photography">Photography</option>
+                            <option value="music">Music</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <span asp-validation-for="ChooseCourse" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+           
+            <div class="input-box col-lg-6">
+                <label class="label-text">Course Type</label>
+                <div class="form-group select2-full-wrapper">
+                    <div class="select-container w-auto">
+                        <select asp-for="CourseType" class="select-container-select">
+                            <option value="">Select Course Type</option>
+                            <option value="online">Online</option>
+                            <option value="offline">Offline</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+       
+
+            <div class="btn-box col-lg-12">
+                <button class="btn theme-btn" type="submit">
+                    Register Account
+                    <i class="la la-arrow-right icon ms-1"></i>
+                </button>
+            </div>
+        }
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Reset form after submit
+        if (document.querySelector('.alert-success')) {
+            setTimeout(() => {
+                document.querySelector("form").reset();
+            }, 3000);
+        }
+
+                $(document).ready(function () {
+            $('#ChooseCourse').select2({
+                placeholder: "Select a category",
+                allowClear: true,
+                width: 'resolve' // أو 'style' لو CSS متحكم في الحجم
+            });
+        });
+
+    </script>
+}
