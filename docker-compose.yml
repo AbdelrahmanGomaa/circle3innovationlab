@@ -1,24 +1,27 @@
 # docker-compose.yml
-
-version: "3.9"
+version: '3.8'
 
 services:
-  web:
-    build:
-      context: .
-    container_name: circle3lab-web
-    ports:
-      - "5000:80"
-    volumes:
-      - ./media:/app/wwwroot/media
-    restart: always
-
   sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    image: mcr.microsoft.com/mssql/server:2019-latest
     container_name: circle3lab-sql
     environment:
       SA_PASSWORD: "P@ssw0rd123Circle"
       ACCEPT_EULA: "Y"
     ports:
       - "1433:1433"
-    restart: always
+    volumes:
+      - sqlserverdata:/var/opt/mssql
+
+  web:
+    build: .
+    container_name: circle3lab-web
+    ports:
+      - "8080:5000"
+    environment:
+      - ConnectionStrings__umbracoDbDSN=Server=sqlserver,1433;Database=c3lab;User ID=SA;Password=P@ssw0rd123Circle;TrustServerCertificate=true;
+    depends_on:
+      - sqlserver
+
+volumes:
+  sqlserverdata:
