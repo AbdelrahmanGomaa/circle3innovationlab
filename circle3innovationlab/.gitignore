@@ -477,11 +477,11 @@ appsettings-schema.*.json
 
 # Media files
 /wwwroot/media/
-bin/
-obj/
-wwwroot/
-runtimes/
+#bin/
+#obj/
+#wwwroot/
+#runtimes/
 .vs/
-*.dll
-*.pdb
-*.exe
+#*.dll
+#*.pdb
+#*.exe
